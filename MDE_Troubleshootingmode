@@ -1,0 +1,7 @@
+DeviceEvents
+| where Timestamp > ago(3h) // troubleshooting mode automatically disables after 4 hours 
+| where ActionType == "AntivirusTroubleshootModeEvent"
+| extend _tsmodeproperties = parse_json(AdditionalFields)
+| where _tsmodeproperties.TroubleshootingStateChangeReason contains "started"
+|summarize (Timestamp, ReportId)=arg_max(Timestamp, ReportId), count() by DeviceId
+| order by Timestamp desc
